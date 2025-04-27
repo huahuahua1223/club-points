@@ -94,3 +94,23 @@ export const deletePointRule = async (id) => {
     throw new Error(error.response?.data?.message || '删除积分规则失败');
   }
 };
+
+// 获取所有活跃的积分规则（用于下拉框）
+export const getActivePointRulesForSelect = async () => {
+  try {
+    const response = await axios.get(`${API_URL}?status=active&limit=100`, {
+      headers: getAuthHeader()
+    });
+    
+    // 转换为下拉框需要的格式 { value: id, label: ruleName }
+    const rules = response.data.data.rules || [];
+    return rules.map(rule => ({
+      value: rule._id,
+      label: `${rule.ruleName} (${rule.basePoints}积分)`,
+      data: rule // 保存完整规则数据，以便需要时使用
+    }));
+  } catch (error) {
+    console.error('获取积分规则下拉数据错误:', error.response || error);
+    return []; // 出错时返回空数组，避免页面崩溃
+  }
+};
