@@ -1,0 +1,72 @@
+.point-rule-management {
+  padding: 24px;
+  background: #fff;
+  min-height: 100%;
+}
+
+.rule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.rule-header h2 {
+  margin: 0;
+  color: #1f1f1f;
+  font-size: 24px;
+}
+
+/* 表格样式 */
+.point-rule-management .ant-table-wrapper {
+  margin-top: 16px;
+}
+
+.point-rule-management .ant-table-thead > tr > th {
+  background: #fafafa;
+  font-weight: 600;
+}
+
+/* 表单样式 */
+.point-rule-management .ant-form-item-label > label {
+  font-weight: 500;
+}
+
+.point-rule-management .ant-modal-body {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* 按钮样式 */
+.point-rule-management .ant-btn-link {
+  padding: 4px 8px;
+}
+
+.point-rule-management .ant-btn-link:not(:last-child) {
+  margin-right: 8px;
+}
+
+/* 状态开关样式 */
+.point-rule-management .ant-switch {
+  min-width: 44px;
+}
+
+/* 表单内嵌项样式 */
+.point-rule-management .ant-form-item-label {
+  padding-bottom: 4px;
+}
+
+.point-rule-management .ant-form-item {
+  margin-bottom: 16px;
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .point-rule-management {
+    padding: 16px;
+  }
+
+  .rule-header h2 {
+    font-size: 20px;
+  }
+} 

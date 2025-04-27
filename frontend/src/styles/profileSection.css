@@ -1,0 +1,173 @@
+.profile-section {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  
+  .profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .profile-header h2 {
+    margin: 0;
+    color: #1a237e;
+    font-size: 20px;
+  }
+  
+  .edit-button,
+  .save-button,
+  .cancel-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+  
+  .edit-button {
+    background: #1a237e;
+    color: white;
+  }
+  
+  .edit-button:hover {
+    background: #3949ab;
+  }
+  
+  .edit-actions {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .save-button {
+    background: #4caf50;
+    color: white;
+  }
+  
+  .save-button:hover {
+    background: #43a047;
+  }
+  
+  .cancel-button {
+    background: #f44336;
+    color: white;
+  }
+  
+  .cancel-button:hover {
+    background: #e53935;
+  }
+  
+  .profile-error {
+    background: #ffebee;
+    color: #c62828;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  
+  .profile-form {
+    display: grid;
+    gap: 20px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .form-group label {
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  
+  .form-group input {
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+  }
+  
+  .form-group input:focus {
+    border-color: #1a237e;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+  }
+  
+  .info-value {
+    padding: 10px;
+    background: #f5f7fa;
+    border-radius: 8px;
+    color: #333;
+    font-size: 15px;
+  }
+  
+  .error-message {
+    background: #ffebee;
+    color: #c62828;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  
+  .success-message {
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  
+  /* 暗色模式支持 */
+  @media (prefers-color-scheme: dark) {
+    .profile-section {
+      background: #2d2d2d;
+    }
+  
+    .profile-header {
+      border-bottom-color: #444;
+    }
+  
+    .profile-header h2 {
+      color: #fff;
+    }
+  
+    .form-group label {
+      color: #bbb;
+    }
+  
+    .form-group input {
+      background: #3d3d3d;
+      border-color: #4d4d4d;
+      color: #fff;
+    }
+  
+    .form-group input:focus {
+      border-color: #7986cb;
+      background: #3d3d3d;
+    }
+  
+    .info-value {
+      background: #3d3d3d;
+      color: #fff;
+    }
+  
+    .profile-error {
+      background: #421818;
+      color: #ff8a8a;
+    }
+  }
