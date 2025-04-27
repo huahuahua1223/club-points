@@ -17,6 +17,7 @@ const authRoutes = require('./routes/auth');
 const activityRoutes = require('./routes/activity');
 const pointsRoutes = require('./routes/points');
 const pointRuleRoutes = require('./routes/pointRule');
+const uploadRoutes = require('./routes/upload');
 
 // 连接数据库
 connectDB();
@@ -55,12 +56,14 @@ app.use(morgan('dev'));
 
 // 静态资源目录
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 // 路由
 app.use('/api/auth', authRoutes);
 app.use('/api/activities', activityRoutes);
 app.use('/api/points', pointsRoutes);
 app.use('/api/points/rules', pointRuleRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // 测试接口
 app.get('/api/test', (req, res) => {
@@ -136,7 +139,9 @@ app.use((err, req, res, next) => {
 const dirs = [
   path.join(__dirname, 'public'),
   path.join(__dirname, 'public/uploads'),
-  path.join(__dirname, 'public/uploads/avatars')
+  path.join(__dirname, 'public/uploads/avatars'),
+  path.join(__dirname, 'public/images'),
+  path.join(__dirname, 'public/images/activities')
 ];
 dirs.forEach(dir => {
   if (!fs.existsSync(dir)) {
@@ -155,6 +160,7 @@ app.listen(PORT, () => {
 环境: ${process.env.NODE_ENV || 'development'}
 测试API: http://localhost:${PORT}/api/test
 上传路径: ${path.join(__dirname, 'public/uploads')}
+活动图片: ${path.join(__dirname, 'public/images/activities')}
 -----------------------------
   `);
 });

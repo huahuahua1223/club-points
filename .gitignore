@@ -1,4 +1,5 @@
 node_modules
 
 backend/public/uploads
+backend/public/images
 frontend/public/uploads

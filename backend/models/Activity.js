@@ -37,9 +37,17 @@ const activitySchema = new mongoose.Schema({
     },
     registeredAt: { type: Date, default: Date.now }
   }],
-  images: [{ url: String, description: String }],
+  coverImage: { 
+    type: String, 
+    default: '/images/default-activity.jpg' 
+  },
+  images: [{ 
+    url: { type: String, required: true },
+    description: { type: String },
+    uploadedAt: { type: Date, default: Date.now }
+  }],
   requirements: String,
-  tags: [{}],
+  tags: [{ type: String }],
   checkInCode: { type: String }  // 添加签到码字段
 }, {
   timestamps: true  // 自动维护 createdAt / updatedAt
