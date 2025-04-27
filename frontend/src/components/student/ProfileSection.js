@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../../styles/components.css';
+import { useAuth } from '../../contexts/AuthContext';
+import { message } from 'antd';
 
-const ProfileSection = ({ user, onUpdate, setError }) => {
+const ProfileSection = () => {
+  const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -13,7 +17,7 @@ const ProfileSection = ({ user, onUpdate, setError }) => {
     class: ''
   });
 
-  // 当 user 有效时才更新表单
+  // 当组件挂载或user变化时更新表单
   useEffect(() => {
     if (user) {
       setFormData({
@@ -24,8 +28,45 @@ const ProfileSection = ({ user, onUpdate, setError }) => {
         college: user.college || '',
         class: user.class || ''
       });
+    } else {
+      // 如果没有user数据，尝试从API获取
+      fetchUserData();
     }
   }, [user]);
+
+  // 获取用户数据
+  const fetchUserData = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      const response = await axios.get(
+        'http://localhost:5000/api/auth/me',
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      
+      const userData = response.data.data.user;
+      setFormData({
+        username: userData.username || '',
+        email: userData.email || '',
+        phone: userData.phone || '',
+        studentId: userData.studentId || '',
+        college: userData.college || '',
+        class: userData.class || ''
+      });
+      
+      // 更新全局用户状态
+      updateUser(userData);
+    } catch (err) {
+      console.error('获取用户数据失败:', err);
+      message.error('获取用户数据失败，请刷新重试');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -36,6 +77,7 @@ const ProfileSection = ({ user, onUpdate, setError }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const token = localStorage.getItem('token');
       const response = await axios.put(
@@ -45,17 +87,26 @@ const ProfileSection = ({ user, onUpdate, setError }) => {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      onUpdate(response.data.data.user);
+      
+      // 更新本地存储的用户信息
+      const updatedUser = response.data.data.user;
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      // 更新全局用户状态
+      updateUser(updatedUser);
+      
       setIsEditing(false);
-      setError('个人信息更新成功');
-      setTimeout(() => setError(''), 3000);
+      message.success('个人信息更新成功');
     } catch (err) {
-      setError(err.response?.data?.message || '更新失败');
+      console.error('更新失败:', err);
+      message.error(err.response?.data?.message || '更新失败');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // 如果 user 还未加载，显示 loading 或空内容
-  if (!user) {
+  // 如果正在加载，显示loading
+  if (loading) {
     return <div className="profile-section">加载中...</div>;
   }
 
@@ -67,27 +118,27 @@ const ProfileSection = ({ user, onUpdate, setError }) => {
         <div className="profile-info">
           <div className="info-group">
             <label>用户名</label>
-            <p>{user.username}</p>
+            <p>{formData.username}</p>
           </div>
           <div className="info-group">
             <label>学号</label>
-            <p>{user.studentId}</p>
+            <p>{formData.studentId}</p>
           </div>
           <div className="info-group">
             <label>邮箱</label>
-            <p>{user.email}</p>
+            <p>{formData.email}</p>
           </div>
           <div className="info-group">
             <label>手机号</label>
-            <p>{user.phone}</p>
+            <p>{formData.phone}</p>
           </div>
           <div className="info-group">
             <label>学院</label>
-            <p>{user.college}</p>
+            <p>{formData.college}</p>
           </div>
           <div className="info-group">
             <label>班级</label>
-            <p>{user.class}</p>
+            <p>{formData.class}</p>
           </div>
           <button 
             className="edit-btn"
@@ -160,13 +211,14 @@ const ProfileSection = ({ user, onUpdate, setError }) => {
             />
           </div>
           <div className="form-actions">
-            <button type="submit" className="save-btn">
-              保存
+            <button type="submit" className="save-btn" disabled={loading}>
+              {loading ? '保存中...' : '保存'}
             </button>
             <button 
               type="button" 
               className="cancel-btn"
               onClick={() => setIsEditing(false)}
+              disabled={loading}
             >
               取消
             </button>
