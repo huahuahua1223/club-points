@@ -1,0 +1,71 @@
+.activity-list-container {
+  padding: 20px;
+}
+
+.activity-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.create-button {
+  margin-right: 16px;
+}
+
+.search-input {
+  width: 300px;
+}
+
+.activity-cards {
+  margin-bottom: 24px;
+}
+
+.activity-card {
+  height: 100%;
+  transition: transform 0.3s;
+}
+
+.activity-card:hover {
+  transform: translateY(-5px);
+}
+
+.card-image-container {
+  height: 200px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.activity-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.activity-card-image:hover {
+  transform: scale(1.05);
+}
+
+.activity-card-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-card-content p {
+  margin-bottom: 6px;
+}
+
+.activity-type {
+  margin-bottom: 10px;
+}
+
+.pagination-container {
+  margin-top: 24px;
+  text-align: right;
+} 

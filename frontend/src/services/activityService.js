@@ -276,7 +276,7 @@ export const getActivityParticipants = async (activityId, page = 1, limit = 10) 
     });
     if (response.success) {
       // 确保返回的 participants 是数组，如果不是则使用空数组
-      const participants = Array.isArray(response.data.participants) ? response.data.participants : [];
+      const participants = Array.isArray(response.data) ? response.data : [];
       return {
         success: true,
         data: participants
