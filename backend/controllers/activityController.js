@@ -244,29 +244,54 @@ exports.completeActivity = catchAsync(async (req, res) => {
     return new AppError('活动未开始或已结束', 400);
   }
 
-  // 为所有参与者添加积分
-  for (const participantId of activity.participants) {
-    if (participantId) {
-      const user = await User.findById(participantId);
+  // 更新活动状态为已完成
+  activity.status = 'completed';
+  await activity.save();
+
+  // 获取所有已签到的参与者
+  const checkedInParticipants = await ActivityParticipant.find({
+    activity: activity._id,
+    status: 'checked-in'
+  });
+
+  // 为已签到的参与者添加积分
+  if (activity.points && checkedInParticipants.length > 0) {
+    for (const participant of checkedInParticipants) {
+      const user = await User.findById(participant.user);
       if (user) {
-        user.points += activity.points;
+        // 确保有积分值
+        const pointsValue = activity.points.value || 0;
+        
+        // 更新用户积分
+        user.points = (user.points || 0) + pointsValue;
         await user.save();
 
+        // 创建积分记录
         await PointsRecord.create({
-          user: participantId,
-          points: activity.points,
+          user: participant.user,
+          points: pointsValue,
           type: 'earn',
-          description: `参加活动"${activity.title}"获得积分`
+          description: `参加活动"${activity.title}"获得积分`,
+          activity: activity._id
         });
       }
     }
   }
 
-  activity.status = 'completed';
-  await activity.save();
+  // 将未签到的参与者状态设置为缺席
+  await ActivityParticipant.updateMany(
+    { 
+      activity: activity._id, 
+      status: 'registered' 
+    },
+    { 
+      status: 'absent' 
+    }
+  );
 
   res.status(200).json({
-    status: 'success',
+    success: true,
+    message: '活动已成功结束',
     data: {
       activity
     }
@@ -303,14 +328,28 @@ exports.signupActivity = catchAsync(async (req, res, next) => {
     return next(new AppError('活动名额已满', 400));
   }
 
+  // 创建报名时间
+  const registeredAt = new Date();
+
   // 添加新参与者
   activity.participants.push({ 
     user: req.user._id, 
     status: 'registered',
-    registeredAt: new Date()
+    registeredAt
   });
   
+  // 更新当前参与人数
+  activity.currentParticipants = activity.participants.length;
+  
   await activity.save();
+
+  // 创建ActivityParticipant记录
+  await ActivityParticipant.create({
+    activity: activity._id,
+    user: req.user._id,
+    status: 'registered',
+    registeredAt
+  });
 
   res.status(200).json({
     status: 'success',
@@ -337,23 +376,30 @@ exports.cancelSignupActivity = catchAsync(async (req, res, next) => {
   }
 
   // 查找用户报名记录的索引
-  const index = activity.participants.findIndex(p => 
+  const participantIndex = activity.participants.findIndex(p => 
     p.user && p.user.toString() === req.user._id.toString()
   );
   
-  if (index === -1) {
+  if (participantIndex === -1) {
     return next(new AppError('您未报名该活动', 400));
   }
 
   // 移除报名记录
-  activity.participants.splice(index, 1);
+  activity.participants.splice(participantIndex, 1);
+  
+  // 更新当前参与人数
+  activity.currentParticipants = activity.participants.length;
+  
   await activity.save();
 
+  // 删除对应的ActivityParticipant记录
+  await ActivityParticipant.findOneAndDelete({
+    activity: activity._id,
+    user: req.user._id
+  });
+
   res.status(200).json({
-    status: 'success',
-    data: {
-      activity
-    }
+    message: "取消报名成功"
   });
 });
 
@@ -393,6 +439,12 @@ exports.checkInActivity = catchAsync(async (req, res, next) => {
   // 更新签到状态
   activity.participants[participantIndex].status = 'checkedIn';
   await activity.save();
+
+  // 更新ActivityParticipant记录的状态
+  await ActivityParticipant.findOneAndUpdate(
+    { activity: activity._id, user: req.user._id },
+    { status: 'checked-in' }
+  );
 
   res.status(200).json({
     status: 'success',
@@ -467,10 +519,13 @@ exports.getActivityParticipants = catchAsync(async (req, res, next) => {
     return next(new AppError('未找到该活动', 404));
   }
 
-  const participants = await ActivityParticipant.find({ activity: req.params.id });
+  const participants = await ActivityParticipant.find({ activity: req.params.id })
+    .populate('user', 'name studentId email avatar')
+    .sort('registeredAt');
+
   res.status(200).json({
-    status: 'success',
-    data: { participants }
+    success: true,
+    data: participants
   });
 });
 
